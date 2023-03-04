@@ -8,8 +8,11 @@ app = FastAPI()
 
 
 class Post(BaseModel):
-    firstname: str
-    lastname: str
+    title: str
+    teacher: str
+    content: str
+    rating: str
+    graduated: bool = False  # default value is false
 
 
 @app.get("/")
@@ -27,9 +30,9 @@ def get_posts():
 
 @app.post("/createposts")
 # def create_posts(payload: dict = Body(...)):  # extracting data from the body
-def create_posts(post: Post):
+def create_posts(post: Post):  # here posr:Post is the object of the class Post that we created for the body of the request to be converted to the object
     print(post)
-    print(post.dict())  # convert the object to dictionary
+    print(post.graduated)    # convert the object to dictionary
     return {"data": post}
 
 
