@@ -15,6 +15,10 @@ class Post(BaseModel):
     graduated: bool = False  # default value is false
 
 
+new_post = [{"title": "CECS 229", "teacher": "chag", "content": "", "rating": 4, "graduated": True},
+            {"title": "CECS 274", "teacher": "sapkota", "content": "", "rating": 4, "graduated": True},]
+
+
 @app.get("/")
 async def root():  # async that takes certain amount of time to execute and we dont want to wait for it to execute
     return {"message": "welcome to the world of computer science"}
@@ -28,16 +32,31 @@ def get_posts():
 # in create post we want to tell front what data we are expecting, we want two string
 
 
-@app.post("/createposts")
+@app.post("/posts")
 # def create_posts(payload: dict = Body(...)):  # extracting data from the body
-def create_posts(post: Post):  # here posr:Post is the object of the class Post that we created for the body of the request to be converted to the object
-    print(post)
-    print(post.graduated)    # convert the object to dictionary
-    return {"data": post}
+# here posr:Post is the object of the class Post that we created for the body of the request to be converted to the object
+def create_posts(new_post: Post):
+    # convert the object to dictionary
+    return {"data": new_post}
 
 
 # inside payload we have email and firstName.
+# response
 # {
-#     "firstname": "aayam",
-#     "lastname": "sapkotaaaaaaa"
+#     "data": [
+#         {
+#             "title": "CECS 229",
+#             "teacher": "chag",
+#             "content": "",
+#             "rating": 4,
+#             "graduated": true
+#         },
+#         {
+#             "title": "CECS 274",
+#             "teacher": "sapkota",
+#             "content": "",
+#             "rating": 4,
+#             "graduated": true
+#         }
+#     ]
 # }
