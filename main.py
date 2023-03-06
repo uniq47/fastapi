@@ -2,6 +2,7 @@
 from typing import Optional
 from fastapi import Body, FastAPI
 from pydantic import BaseModel
+from  random  import randrange
 
 app = FastAPI()
 # FastAPI is a class and we are creating an instance of it and storing it in a variable called app
@@ -36,11 +37,14 @@ def get_posts():
 @app.post("/posts")
 # def create_posts(payload: dict = Body(...)):  # extracting data from the body
 # here posr:Post is the object of the class Post that we created for the body of the request to be converted to the object
-def create_posts(new_post: Post):
+def create_posts(post: Post):
     #print(new_post)
-    dict_new_post = new_post.dict()
+
+    post_dict = post.dict()
+    post_dict["id"] = randrange(0, 100000)
+    print(post_dict)
     #print(dict_new_post)
-    new_post.append(dict_new_post)
+    new_post.append(post_dict)
     return {"data": new_post}
 print(new_post)
     # convert the object to dictionary, retriving posts from the database
