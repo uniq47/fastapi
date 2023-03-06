@@ -42,30 +42,11 @@ def create_posts(post: Post):
 
     post_dict = post.dict()
     post_dict["id"] = randrange(0, 100000)
-    print(post_dict)
-    #print(dict_new_post)
     new_post.append(post_dict)
     return {"data": new_post}
-print(new_post)
+
     # convert the object to dictionary, retriving posts from the database
 
-# inside payload we have email and firstName.
-# response
-# {
-#     "data": [
-#         {
-#             "title": "CECS 229",
-#             "teacher": "chag",
-#             "content": "",
-#             "rating": 4,
-#             "graduated": true
-#         },
-#         {
-#             "title": "CECS 274",
-#             "teacher": "sapkota",
-#             "content": "",
-#             "rating": 4,
-#             "graduated": true
-#         }
-#     ]
-# }
+@app.get("/posts/{id}")
+def get_post(id):
+    return {"data": id}
