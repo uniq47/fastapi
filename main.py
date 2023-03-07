@@ -21,6 +21,11 @@ new_post = [{"title": "CECS 229", "teacher": "gurg", "content": "", "rating": 4,
             {"title": "CECS 274", "teacher": "sapkota", "content": "", "rating": 4, "takeTheClassAgain": True, "id":2},]
 
 
+def find_item(id):
+    for p in new_post:
+        if p["id"] == id:
+            return p 
+
 @app.get("/")
 async def root():  # async that takes certain amount of time to execute and we dont want to wait for it to execute
     return {"message": "welcome to the world of computer science"}
@@ -28,18 +33,13 @@ async def root():  # async that takes certain amount of time to execute and we d
 
 @app.get("/posts")
 def get_posts():
-    # logic to retrive the posts from the database
     return {"data": new_post}
 
-# in create post we want to tell front what data we are expecting, we want two string
+
 
 
 @app.post("/posts")
-# def create_posts(payload: dict = Body(...)):  # extracting data from the body
-# here posr:Post is the object of the class Post that we created for the body of the request to be converted to the object
 def create_posts(post: Post):
-    #print(new_post)
-
     post_dict = post.dict()
     post_dict["id"] = randrange(0, 100000)
     new_post.append(post_dict)
@@ -48,5 +48,8 @@ def create_posts(post: Post):
     # convert the object to dictionary, retriving posts from the database
 
 @app.get("/posts/{id}")
-def get_post(id):
-    return {"data": id}
+def get_post(id: int):
+    item = find_item(id)
+    print("This is the item" , item)
+    return {"data": item}
+
