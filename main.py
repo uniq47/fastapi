@@ -1,6 +1,6 @@
 # body is used to extract data from the body of the request and assign it to a variable
 from typing import Optional
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 from  random  import randrange
 
@@ -38,7 +38,7 @@ def get_posts():
 
 
 
-@app.post("/posts")
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
     post_dict = post.dict()
     post_dict["id"] = randrange(0, 100000)
@@ -48,8 +48,11 @@ def create_posts(post: Post):
     # convert the object to dictionary, retriving posts from the database
 
 @app.get("/posts/{id}")
-def get_post(id: int):
-    item = find_item(id)
-    print("This is the item" , item)
-    return {"data": item}
+def get_post(id: int, response: Response):
+    post = find_item(id)
+    if not post:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"post not found with id {id}")
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"error": "post not found"}
+    return {"data": post}
 
