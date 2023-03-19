@@ -1,4 +1,5 @@
 # body is used to extract data from the body of the request and assign it to a variable
+import time
 from typing import Optional
 from fastapi import Body, FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
@@ -12,25 +13,26 @@ app = FastAPI()
 
 
 class Post(BaseModel):
-    title: str
+    course: str
     teacher: str
-    content: str
     rating: Optional[int] = None  # default value is none,
-    takeTheClassAgain: bool = True  # default value is false
 
 
-try:
-    conn = psycopg2.connect(host='localhost', database='rate_your_professor',
-                            user='postgres', password='12345', cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    print("connected to database")
-except Exception as error:
-    print("error connecting to database")
-    print(error)
+while True:
+    try:
+        conn = psycopg2.connect(host='localhost', database='rate_your_professor',
+                                user='postgres', password='12345', cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print("connected to database")
+        break
+    except Exception as error:
+        print("error connecting to database")
+        print(error)
+        time.sleep(5)
 
 
-new_post = [{"title": "CECS 229", "teacher": "gurg", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 1},
-            {"title": "CECS 274", "teacher": "sapkota", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 2},]
+new_post = [{"class": "CECS 229", "teacher": "gurg", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 1},
+            {"class": "CECS 274", "teacher": "sapkota", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 2},]
 
 
 def find_item(id):
@@ -52,7 +54,10 @@ async def root():  # async that takes certain amount of time to execute and we d
 
 @app.get("/posts")
 def get_posts():
-    return {"data": new_post}
+    cursor.execute("""SELECT * FROM posts""")
+    posts = cursor.fetchall()
+    print(posts)
+    return {"data": posts}
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
