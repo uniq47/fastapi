@@ -5,7 +5,13 @@ from fastapi import Body, FastAPI, Response, status, HTTPException
 from pydantic import BaseModel
 from random import randrange
 import psycopg2
+from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
+from . import models
+from .database import engine, get_db
+
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 # FastAPI is a class and we are creating an instance of it and storing it in a variable called app
@@ -18,6 +24,8 @@ class Post(BaseModel):
     rating: Optional[int] = None  # default value is none,
     take_again: Optional[bool] = None
 
+
+new_post = []
 
 while True:
     try:
@@ -47,6 +55,11 @@ def find_index_post(id):
 @app.get("/")
 async def root():  # async that takes certain amount of time to execute and we dont want to wait for it to execute
     return {"message": "welcome to the world of computer science"}
+
+
+@app.get("/sqlAlchemy")
+def test_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 
 @app.get("/posts")
@@ -96,7 +109,7 @@ def delete_post(id: int):
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
     cursor.execute(
-        """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s returning *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))
+        """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s RETURNING *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))
     updated_post = cursor.fetchone()
     conn.commit()
     if updated_post == None:
