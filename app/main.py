@@ -2,12 +2,12 @@
 import time
 from typing import Optional
 from fastapi import Body, Depends, FastAPI, Response, status, HTTPException
-from pydantic import BaseModel
+
 from random import randrange
 import psycopg2
 from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 
 
@@ -16,13 +16,6 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 # FastAPI is a class and we are creating an instance of it and storing it in a variable called app
 # Post method will  extends BaseModel class
-
-
-class Post(BaseModel):
-    course: str
-    teacher: str
-    rating: Optional[int] = None  # default value is none,
-    take_again: Optional[bool] = None
 
 
 new_post = []
@@ -57,12 +50,6 @@ async def root():  # async that takes certain amount of time to execute and we d
     return {"message": "welcome to the world of computer science"}
 
 
-@app.get("/sqlalchemy")
-def test_posts(db: Session = Depends(get_db)):
-    post = db.query(models.Post).all()
-    return {"status": post}
-
-
 @app.get("/posts")
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
@@ -72,7 +59,7 @@ def get_posts(db: Session = Depends(get_db)):
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: S ession = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts(course, teacher, rating, take_again) VALUES(%s, %s, %s,%s) RETURNING *""",
     #                (post.course, post.teacher, post.rating, post.take_again))
     # new_post = cursor.fetchone()
@@ -119,7 +106,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
 
 @app.put("/posts/{id}")
-def update_post(id: int, updated_post: Post, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s RETURNING *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))
     # updated_post = cursor.fetchone()
