@@ -1,6 +1,6 @@
 # body is used to extract data from the body of the request and assign it to a variable
 import time
-from typing import Optional
+from typing import Optional, List
 from fastapi import Body, Depends, FastAPI, Response, status, HTTPException
 
 from random import randrange
@@ -50,16 +50,16 @@ async def root():  # async that takes certain amount of time to execute and we d
     return {"message": "welcome to the world of computer science"}
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
     post = db.query(models.Post).all()
-    return {"data": post}
+    return post
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: schemas.PostCreate, db: S ession = Depends(get_db)):
+@ app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts(course, teacher, rating, take_again) VALUES(%s, %s, %s,%s) RETURNING *""",
     #                (post.course, post.teacher, post.rating, post.take_again))
     # new_post = cursor.fetchone()
@@ -72,12 +72,12 @@ def create_posts(post: schemas.PostCreate, db: S ession = Depends(get_db)):
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {"data": new_post}
+    return new_post
 
     # convert the object to dictionary, retriving posts from the database
 
 
-@app.get("/posts/{id}")
+@ app.get("/posts/{id}", response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """SELECT * from posts WHERE id = %s""", (str(id)))
@@ -87,10 +87,10 @@ def get_post(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail=f"post not found with id {id}")
 
-    return {"data": post}
+    return post
 
 
-@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@ app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""DELETE FROM posts WHERE id =%s returning *""", (str(id)))
     # deleted_post = cursor.fetchone()
@@ -105,7 +105,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@app.put("/posts/{id}")
+@ app.put("/posts/{id}", response_model=schemas.Post)
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s RETURNING *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))
@@ -121,4 +121,4 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
 
     post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
-    return {"data": post_query.first()}
+    return post_query.first()
