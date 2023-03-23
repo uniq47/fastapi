@@ -2,7 +2,6 @@
 import time
 from typing import Optional, List
 from fastapi import Body, Depends, FastAPI, Response, status, HTTPException
-
 from random import randrange
 import psycopg2
 from sqlalchemy.orm import Session
@@ -18,7 +17,8 @@ app = FastAPI()
 # Post method will  extends BaseModel class
 
 
-new_post = []
+new_post = [{"class": "CECS 229", "teacher": "gurg", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 1},
+            {"class": "CECS 274", "teacher": "sapkota", "content": "", "rating": 4, "takeTheClassAgain": True, "id": 2},]
 
 while True:
     try:
@@ -50,7 +50,7 @@ async def root():  # async that takes certain amount of time to execute and we d
     return {"message": "welcome to the world of computer science"}
 
 
-@app.get("/posts", response_model=List[schemas.Post])
+@app.get("/posts", response_model=List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
@@ -58,7 +58,7 @@ def get_posts(db: Session = Depends(get_db)):
     return post
 
 
-@ app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts(course, teacher, rating, take_again) VALUES(%s, %s, %s,%s) RETURNING *""",
     #                (post.course, post.teacher, post.rating, post.take_again))
@@ -77,7 +77,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # convert the object to dictionary, retriving posts from the database
 
 
-@ app.get("/posts/{id}", response_model=schemas.Post)
+@app.get("/posts/{id}", response_model=schemas.PostResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """SELECT * from posts WHERE id = %s""", (str(id)))
@@ -105,7 +105,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@ app.put("/posts/{id}", response_model=schemas.Post)
+@ app.put("/posts/{id}", response_model=schemas.PostResponse)
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s RETURNING *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))

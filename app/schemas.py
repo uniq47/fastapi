@@ -14,7 +14,7 @@ class PostCreate(PostBase):
     pass
 
 
-class Post(PostBase):
+class PostResponse(PostBase):
     id: int
     created_at: datetime
 
