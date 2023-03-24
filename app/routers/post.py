@@ -5,10 +5,12 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from typing import List
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/posts"
+)
 
 
-@router.get("/posts", response_model=List[schemas.PostResponse])
+@router.get("/", response_model=List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
@@ -16,7 +18,7 @@ def get_posts(db: Session = Depends(get_db)):
     return post
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute("""INSERT INTO posts(course, teacher, rating, take_again) VALUES(%s, %s, %s,%s) RETURNING *""",
     #                (post.course, post.teacher, post.rating, post.take_again))
@@ -35,7 +37,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # convert the object to dictionary, retriving posts from the database
 
 
-@router.get("/posts/{id}", response_model=schemas.PostResponse)
+@router.get("/{id}", response_model=schemas.PostResponse)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """SELECT * from posts WHERE id = %s""", (str(id)))
@@ -48,7 +50,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute("""DELETE FROM posts WHERE id =%s returning *""", (str(id)))
     # deleted_post = cursor.fetchone()
@@ -63,7 +65,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@ router.put("/posts/{id}", response_model=schemas.PostResponse)
+@ router.put("/{id}", response_model=schemas.PostResponse)
 def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(
     #     """UPDATE posts SET course = %s, teacher = %s, rating = %s, take_again = %s WHERE id = %s RETURNING *""", (post.course, post.teacher, post.rating, post.take_again, str(id)))
