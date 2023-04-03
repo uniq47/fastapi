@@ -1,17 +1,13 @@
 # body is used to extract data from the body of the request and assign it to a variable
+from fastapi import Body, Depends, FastAPI
+from .routers import post, user, auth
 import time
-from typing import Optional, List
-from fastapi import Body, Depends, FastAPI, Response, status, HTTPException
 from random import randrange
 import psycopg2
-from sqlalchemy.orm import Session
 from psycopg2.extras import RealDictCursor
-
-# from app.routers import auth
-from .routers import post
-from . import models, schemas, utils
+from . import models
 from .database import engine, get_db
-from .routers import user, auth
+
 
 models.Base.metadata.create_all(bind=engine)
 
